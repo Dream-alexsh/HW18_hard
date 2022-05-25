@@ -1,4 +1,5 @@
 from flask_restx import Resource, Namespace
+from sqlalchemy.exc import NoResultFound
 
 from container import genre_service
 from dao.models.genres import GenreSchema
@@ -12,11 +13,9 @@ genre_schema = GenreSchema()
 @genre_ns.route('/')
 class GenresView(Resource):
     def get(self):
-        try:
-            genres = genre_service.get_all()
-            return genres_schema.dump(genres), 200
-        except Exception as e:
-            str(e), 404
+        genres = genre_service.get_all()
+        return genres_schema.dump(genres), 200
+
 
 
 @genre_ns.route('/<int:bid>')
@@ -25,5 +24,5 @@ class GenreView(Resource):
         try:
             genre = genre_service.get_one(bid)
             return genre_schema.dump(genre), 200
-        except Exception as e:
+        except NoResultFound as e:
             return str(e), 404
